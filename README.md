@@ -4,7 +4,10 @@ Website:
 Then create a urls.py file in main directory to manage the URL routing related to the application. Add an URL route in the project's urls.py to connect it to the main view. 
 
 2; 
+
+
 <img width="256" alt="Screenshot 2024-09-11 at 12 51 18 AM" src="https://github.com/user-attachments/assets/3ca7f5ff-bf49-434e-9cdb-bd0af15d9a7c">
+
 The urls.py, maps the URL request to appropriate view function. It acts like a router, directing the request based on the URL pattern. The views.py(View Layer) processes the request. It handles the data, and prepare the data to be rendered. The models.py is interacted with the view. Models.py represents the data structure and handles database queries. Once the view has necessary data, it renders the html template. It presents the data to the client using Django's tmeplating engine using the html file.
 
 3; Git is used to track changes in source code during development. It also enables multiple developers to work together on non-linear development. 
