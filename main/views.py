@@ -7,7 +7,7 @@ from django.core import serializers
 # Create your views here.
 def show_main(request):
     notes_entries = Product.objects.all()
-
+    
     context = {
         'name' : 'Min Kim',
         'class': 'KKI',
