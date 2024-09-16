@@ -11,7 +11,8 @@
 {% else %}
 <table>
     <tr>
-        <th>Subject Name</th>
+        <th>Name</th>
+        <th>Subject</th>
         <th>Description</th>
         <th>Price</th>
     </tr>
@@ -22,7 +23,7 @@
     <tr>
         <td>{{note_entry.name}}</td>
         <td>{{note_entry.subject}}</td>
-        <td>{{note_entry.decription}}</td>
+        <td>{{note_entry.description}}</td>
         <td>{{note_entry.price}}</td>
     </tr>
     {% endfor %}
