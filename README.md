@@ -1,7 +1,7 @@
 Website: http://min-kim-ecommerce.pbp.cs.ui.ac.id
 
 <details>
-<summary>Week 1</summary>
+<summary>Assignment 2</summary>
 
 1; My application is about sharing notes of many subjects in all grades by selling them online. First of all, I created a directory and enabled the virtual environment. Then created a Django project. After creating, on the settings.py file of the Django project, I added the PWS deployment URL to the ALLOWED_HOSTS field. Then I ran a command to create a new application with the name main. In settings.py file inside the project directory, I added 'main' to the INSTALLED_APPS so that the application is registered to the project. Next step is build a html file, added a section to put my name and class. Then I modified the models.py file so that it has a model with name Products, and its attributes, name, price, subject, description. After modifying the file, I ran the command to create model migrations. Next is to connect views with templates. Open the views.py file in main application file, then add the import lines 'from django.shortcuts import render.' The render function is used to render HTML views using the data.
 Then create a urls.py file in main directory to manage the URL routing related to the application. Add an URL route in the project's urls.py to connect it to the main view. 
@@ -21,7 +21,7 @@ The urls.py, maps the URL request to appropriate view function. It acts like a r
 </details>
 
 <details>
-<summary>Week 2</summary>
+<summary>Assignment 3</summary>
 
 Data delivery is important in implementing a platform because it ensures an efficient and secure transfer of data between the service and the users. Fast data delivery allows companies to monitor and optimize their operations in real-time. If something goes wrong, they can take immediate actions to correct it. It also supports both the platform's functionality and user experience.
 ***
@@ -53,3 +53,208 @@ JSON by ID
 XML by ID
 <img width="1392" alt="Screenshot 2024-09-16 at 11 42 03 PM" src="https://github.com/user-attachments/assets/99576f95-26d4-4ad3-b4e4-c827b38df01a">
 </details>
+
+<details>
+<summary>Assignment 4</summary>
+  
+#### What is the difference between HttpResponseRedirect() and redirect()?
+For HttpResponseRedirect, the first argument can only be a url, however for redirect, it retuns a HttpResponseRedirect that can accept model, view, or url as it's 'to' argument. 
+
+#### Explain how the MoodEntry model is linked with User!
+MoodEntry model is linked with the User model using the foreign key. This creates a one-to-many relationship where each mood entry belongs to single user, but each user can have many entries. 
+```
+user = models.ForeignKey(User, on_delete=models.CASCADE)
+```
+This line of code connects MoodEntry to a User. ```ForeignKey(User)``` creates a relationship between the models. ```on_delete=models.CASCADE``` ensures that if an user is deleted, all their associated MoodEntry objects are also deleted. 
+
+#### What is the difference between authentication and authorization, and what happens when a user logs in? Explain how Django implements these two concepts.
+Authentication verifies the identity of a user or a service to ensure they're who they claim to be. It involves checking credentials, such as usernames, biometric information, and passwords. Authorization determines the access rights to a user or a system. It determines what an authenticated user is allowed to do. 
+
+Authentication is implemented by initiating Django's ```form = AuthenticationForm(data=request.POST)```. The system validates credentials and if the form is valid (user's credentials are correct), ```get_user()``` method will retrieve the User object for the authenticated user. Authorization is implemented by the decorator ```@login_required(login_url='/login')```. It will allow the only authenticated users to access the view. If the user is not authenticated, the user will be redirected to the login page.
+
+#### How does Django remember logged-in users? Explain other uses of cookies and whether all cookies are safe to use.
+Django remembers logged_in users using sessions and cookies. When a user logs in, Django creates a session and assigns a session ID which is stored in the browser cookie. When user makes a request, session ID cookie is sent back to the server, allowing Django to identify the user without the need to log in again. 
+
+Other uses of cookies include remembering user preferences, tracking user as he/she navigate the website, and to enable the use of e-commerce facilities. 
+
+Not all cookies are safe. Cookies can be stolen or copied from the user, which could either reveal information in the cookies or allow the attacker to edit the contents of the cookies and impersonate the user. 
+
+#### Explain how did you implement the checklist step-by-step
+1. #### Implement registration forms
+   First thing to do is importing UserCreationForm which simplifies creating registration forms in the web app. Add ```register``` function to views.py to generate the registration form and create a user account when the form data is submitted.
+```def register(request):
+    form = UserCreationForm()
+
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your account has been successfully created!')
+            return redirect('main:login')
+    context = {'form':form}
+    return render(request, 'register.html', context)
+```
+  Then, I created a new HTML file named ```register.html``` and add the URL to urlpatterns to access the imported function. 
+```
+{% extends 'base.html' %} {% block meta %}
+<title>Register</title>
+{% endblock meta %} {% block content %}
+
+<div class="login">
+  <h1>Register</h1>
+
+  <form method="POST">
+    {% csrf_token %}
+    <table>
+      {{ form.as_table }}
+      <tr>
+        <td></td>
+        <td><input type="submit" name="submit" value="Register" /></td>
+      </tr>
+    </table>
+  </form>
+
+  {% if messages %}
+  <ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+
+{% endblock content %}
+```
+```
+urlpatterns = [
+     ...
+     path('register/', register, name='register'),
+ ]
+```
+
+2. #### Implement login function
+  Import authenticate, login and AuthenticationForm, HttpResponseRedirect, reverse, and datetime in views.py. Then add a ```login_user``` function to authenticate users trying to log in. In the login_user, a cookie, named last_login is set to track when the user is last logged in. Modify the show_main function and add the snippet ```'last_login': request.COOKIES['last_login']```. 
+```
+def login_user(request):
+   if request.method == 'POST':
+      form = AuthenticationForm(data=request.POST)
+
+      if form.is_valid():
+        user = form.get_user()
+        login(request, user)
+        response = HttpResponseRedirect(reverse("main:show_main"))
+        response.set_cookie('last_login', str(datetime.datetime.now()))
+        return response
+
+   else:
+      form = AuthenticationForm(request)
+   context = {'form': form}
+   return render(request, 'login.html', context)
+```
+```
+...
+context = {
+        'name' : request.user.username,
+        'class': 'KKI',
+        'notes_entries' : notes_entries,
+        'last_login' : request.COOKIES['last_login'],
+    }
+...
+```
+  Create a new HTML file named ```login.html``` and fill it with the following code:
+```{% extends 'base.html' %}
+
+{% block meta %}
+<title>Login</title>
+{% endblock meta %}
+
+{% block content %}
+<div class="login">
+  <h1>Login</h1>
+
+  <form method="POST" action="">
+    {% csrf_token %}
+    <table>
+      {{ form.as_table }}
+      <tr>
+        <td></td>
+        <td><input class="btn login_btn" type="submit" value="Login" /></td>
+      </tr>
+    </table>
+  </form>
+
+  {% if messages %}
+  <ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %} Don't have an account yet?
+  <a href="{% url 'main:register' %}">Register Now</a>
+</div>
+
+{% endblock content %}
+```
+  Then import the function in urls.py, and add the URL path to ```urlpatterns` to access the function. 
+```urlpatterns = [
+   ...
+   path('login/', login_user, name='login'),
+]
+```
+
+3. #### Implement Logout Function
+  First, import logout in views.py and add a logout_user function to implement the logout mechanism. ```response.delete_cookie('last_login')``` deletes the last_login cookie when user logs out. 
+```
+def logout_user(request):
+    logout(request)
+    response = HttpResponseRedirect(reverse('main:login'))
+    response.delete_cookie('last_login')
+    return response
+```
+  Open main.html file and add this code after the hyperlink tag for "Add New Note Entry." Then in urls.py, import the logout_user function and add the URL path to urlpatterns.
+```<a href="{% url 'main:logout' %}">
+    <button>Logout</button>
+</a>
+<h5>Last login session: {{ last_login }}</h5>
+```
+```urlpatterns = [
+   ...
+   path('logout/', logout_user, name='logout'),
+]
+```
+
+4. #### Restrict Access to Main Page
+   In views.py, import login_required import and add the code snippet above the show_main function, so that the main page can be accessed only by the authenticated users.
+```
+@login_required(login_url='/login')
+```
+
+5. #### Connect Product model to User model
+In models.py, import the model User. Then add in Product model:
+```class Product(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+...
+```
+This will connect the models through a relationship so that each Product has associatiation with the user. Then reopen views.py and modify the code in create_note_entry function:
+```
+def create_note_entry(request):
+    form = NotesEntryForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        note_entry = form.save(commit=False)
+        note_entry.user = request.user
+        note_entry.save()
+        return redirect('main:show_main')
+
+    context = {'form': form}
+    return render(request, "create_note_entry.html", context)
+```
+Then change the value of note_entries in show_main function so that it displays Product objects associated with the logged-in user.
+```
+def show_main(request):
+    notes_entries = Product.objects.filter(user=request.user)
+...
+```
+
+</details>
+
