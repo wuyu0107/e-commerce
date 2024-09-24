@@ -1,6 +1,7 @@
 Website: http://min-kim-ecommerce.pbp.cs.ui.ac.id
 
-# Week 1
+<details>
+<summary>Week 1</summary>
 
 1; My application is about sharing notes of many subjects in all grades by selling them online. First of all, I created a directory and enabled the virtual environment. Then created a Django project. After creating, on the settings.py file of the Django project, I added the PWS deployment URL to the ALLOWED_HOSTS field. Then I ran a command to create a new application with the name main. In settings.py file inside the project directory, I added 'main' to the INSTALLED_APPS so that the application is registered to the project. Next step is build a html file, added a section to put my name and class. Then I modified the models.py file so that it has a model with name Products, and its attributes, name, price, subject, description. After modifying the file, I ran the command to create model migrations. Next is to connect views with templates. Open the views.py file in main application file, then add the import lines 'from django.shortcuts import render.' The render function is used to render HTML views using the data.
 Then create a urls.py file in main directory to manage the URL routing related to the application. Add an URL route in the project's urls.py to connect it to the main view. 
@@ -17,9 +18,10 @@ The urls.py, maps the URL request to appropriate view function. It acts like a r
 4; I think Django is used as the starting point because it's very easy to learn and allow us to quickly implement any web in code. 
 
 5; Djangdo model is called an ORM (Object Relational Mapper) as Django web framework includes a default ORM that interacts with data from various relational databses. Django model is a SQL database; used for creating, deleting, updating, or any other actions that relates to databases. The ORM enables users to interact with databses using high-level object-oriented APIs rather than writing SQL queries directly. 
+</details>
 
-
-# Week 2
+<details>
+<summary>Week 2</summary>
 
 Data delivery is important in implementing a platform because it ensures an efficient and secure transfer of data between the service and the users. Fast data delivery allows companies to monitor and optimize their operations in real-time. If something goes wrong, they can take immediate actions to correct it. It also supports both the platform's functionality and user experience.
 ***
@@ -50,3 +52,4 @@ JSON by ID
 
 XML by ID
 <img width="1392" alt="Screenshot 2024-09-16 at 11 42 03 PM" src="https://github.com/user-attachments/assets/99576f95-26d4-4ad3-b4e4-c827b38df01a">
+</details>
