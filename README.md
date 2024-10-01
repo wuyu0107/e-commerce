@@ -258,3 +258,68 @@ def show_main(request):
 
 </details>
 
+<details>
+<summary>Assignment 5</summary>
+
+####  If there are multiple CSS selectors for an HTML element, explain the priority order of these CSS selectors!
+Priority in CSS selection goes in the order: inline styles, IDs, classes/pseudo-classes/attribute selectors, then elements and pseudo-elements. The priority matters when an element has more than one CSS rules that apply to the element. The selector with the highest priority will override the rules that are below its' priority level. Inline style has the highest priority because it is directly written on the element. 
+
+#### Why does responsive design become an important concept in web application development? Give examples of applications that have and have not implemented responsive design!
+Responsive web design is essential firstly because it minimizes the amount of data and code that needs to be loaded, by loading only the necessary resources needed. It also lowers the maintenance since only one website will be used, as that website will adapt and customize its layout accordingly to the device. Additionally, it makes the website user-friendly and may also increase the website's ranking in the search engine as responsive web design can increase website dwell time. Applications that have implemented responsive design include social media platforms (Facebook, Instagram, LinkedIn), email clients(Gmail), video streaming website (Netflix, Youtube), and many more. Applications that have not implemented responsive designs are more of older software applications, and specialized tools like CAD software and video editing softwares. 
+
+#### Explain the differences between margin, border, and padding, and how to implement these three things!
+Margin is the space outside of element's border, while padding is a space inside the element's border. Border wraps around the padding and content of the element.
+Margin controls the outside space of an element, padding controls the inside spce of the element and border forms a line around the element. Below are implementations of margin, border, and padding.
+
+1. Margin
+```p {
+  margin-top: 100px;
+  margin-bottom: 100px;
+  margin-right: 100px;
+  margin-left: 100px;
+  }
+```
+```
+p {
+  margin: 100px 100px 100px 100px;
+}
+```
+
+2. Border (multiple styles of borders)
+```
+p.dotted {border-style: dotted;}
+p.dashed {border-style: dashed;}
+p.solid {border-style: solid;}
+p.double {border-style: double;}
+p.groove {border-style: groove;}
+p.ridge {border-style: ridge;}
+p.inset {border-style: inset;}
+p.outset {border-style: outset;}
+p.none {border-style: none;}
+p.hidden {border-style: hidden;}
+p.mix {border-style: dotted dashed solid double;}
+```
+
+3. Padding
+```
+div {
+  padding-top: 50px;
+  padding-right: 30px;
+  padding-bottom: 50px;
+  padding-left: 80px;
+}
+```
+```
+div {
+  padding: 50px 30px 50px 80px;
+}
+```
+
+#### Explain the concepts of flex box and grid layout along with their uses!
+Flexbox allows developers to create a flexible grid layout, by allocating and aligning space among items. Flexbox is used one-dimensional layout. It is used arrange rows or columns with equal spacing and create flexible navigation bars. On the other hand, grid layout is used for two-dimensional layout with rows and columns. Grid enables developers to develop complex and responsive strategies that are easy to maintain and manage. Grid can be used to create navigation menus with different levels and design a card-based layout with precise control over item placement. 
+
+#### Explain how you implemented the checklist above step-by-step
+
+
+</details>
+
