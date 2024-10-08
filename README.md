@@ -833,3 +833,21 @@ After this, modify and css rules to the HTML files in the application file so th
 </details>
 </details>
 
+<details>
+<summary>Assignment 6</summary>
+  
+#### Explain the benefits of using JavaScript in developing web applications!
+One of the biggest benefits of using JavaScript is enhanced security it offers for client-side applications. With its security, developers can ensure the protection of user data and sensitive information from malicious attacks. Since JavaScript is an inherently fast language, it can be used to build high-performance applications that can handle complex calculations and operations. Its ability to execute code on the client side also makes it faster than server-side languages, reducing the time required for data transfer. It also reduces server load and overhead, as it allows for the code to be executed and data to be processed on the user's device rather than on the server. This also reduces the strain on servers, making them more efficient and cost-effective. 
+
+#### Explain why we need to use await when we call fetch()! What would happen if we don't use await?
+Fetch() function is used to make network requests and returns a Promise. When await is used, it allows for synchronous operation. The system tells JavaScript to wait until the Promise returned by fetch() is resolved or rejected before proceeding to the next line of code. If we do not use await, Javascript won't wait for Promise to be returned before proceeding to the next line of code. We would be working with the Promise object instead of the result of the fetch. 
+
+#### Why do we need to use the csrf_exempt decorator on the view used for AJAX POST?
+csrf_exempt is used to protect views that process POST requests to help prevent attackers from creating malicious forms that trick users into making unwanted changes. 
+
+#### On this week's tutorial, the user input sanitization is done in the back-end as well. Why can't the sanitization be done just in the front-end?
+Having sanitization just in the front-end can be bypassed by shooting directly at website's endpoints, using tools like Postman, since the front-end code runs on the user's browser. This means that users can modify and disable client-side validation, allowing malicious users to intercept and modify a request before reaching the application server. 
+
+#### Explain how you implemented the checklist above step-by-step
+</details>
+
