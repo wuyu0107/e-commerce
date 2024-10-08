@@ -1,5 +1,5 @@
 from django.urls import path
-from main.views import show_main, create_note_entry, show_xml, show_json, show_json_by_id, show_xml_by_id, register, login_user, logout_user, edit_entry, delete_entry
+from main.views import show_main, create_note_entry, show_xml, show_json, show_json_by_id, show_xml_by_id, register, login_user, logout_user, edit_entry, delete_entry, add_note_entry_ajax
 
 app_name = 'main'
 
@@ -15,4 +15,5 @@ urlpatterns = [
     path('logout/', logout_user, name='logout'),
     path('edit-entry/<uuid:id>', edit_entry, name='edit_entry'),
     path('delete/<uuid:id>', delete_entry, name='delete_entry'),
+    path('create-note-entry-ajax', add_note_entry_ajax, name='add_note_entry_ajax')
 ]
