@@ -849,5 +849,247 @@ csrf_exempt is used to protect views that process POST requests to help prevent 
 Having sanitization just in the front-end can be bypassed by shooting directly at website's endpoints, using tools like Postman, since the front-end code runs on the user's browser. This means that users can modify and disable client-side validation, allowing malicious users to intercept and modify a request before reaching the application server. 
 
 #### Explain how you implemented the checklist above step-by-step
+
+1. ####  First thing to implement in the application was to add an error message so that the login process becomes much easier. It will render an error message to the request, which will be then displayed in the login.html. Make the changes in code in ```login_user``` function. 
+```
+@login_required(login_url='/login')
+def login_user(request):
+   if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            response = HttpResponseRedirect(reverse("main:show_main"))
+            response.set_cookie('last_login', str(datetime.datetime.now()))
+            return response
+        else:
+            messages.error(request, "Invalid username or password. Please try again.")
+```
+
+2. #### Create a function to add an entry with AJAX
+First, add two imports to the ```views.py``` file:
+```
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+```
+Then, within the same file, create a new function with the name ```add_note_entry_ajax``` so that it receives the ```request``` parameter. The function should have a ```csrf_exempt``` decorator before it so that Django doesn't check the ```csrf_token``` request that is sent to the function. The function is now like this:
+```
+def add_note_entry_ajax(request):
+    name = request.POST.get("name")
+    subject = request.POST.get("subject")
+    description = request.POST.get("description")
+    price = request.POST.get("price")
+    user = request.user
+
+    new_note_entry = Product(
+        name=name, subject=subject,
+        description = description, price=price,
+        user=user
+    )
+    new_note_entry.save()
+```
+
+3. #### Add routing for ```add_note_entry_ajax```
+In the ```urls.py``` file on ```main``` subdirectory, import the newly created function and add the URL path inside of the ```urlpatterns``` so that the function can be accessed. 
+```
+from main.views import ..., add_mood_entry_ajax
+```
+```
+urlpatterns = [
+    ...
+    path('create-note-entry-ajax', add_note_entry_ajax, name='add_note_entry_ajax')
+]
+```
+
+4. #### Display note entry data with ```fetch()``` API
+In ```views.py``` file, remove the following codes so that we can fetch the entry objects from ```/json``` endpoint. 
+```
+notes_entries = Product.objects.filter(user=request.user)
+```
+```
+'notes_entries' : notes_entries,
+```
+Then also remove this code snippet in ```main.html```file.
+```
+{% if not notes_entries %}
+    <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+        <img src="{% static 'image/no-data.png' %}" alt="No Data Entered" class="w-32 h-32 mb-4"/>
+        <p class="text-center text-gray-600 mt-4">There is no note entries in this page</p>
+    </div>
+{% else %}
+    <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 w-full">
+        {% for note_entry in notes_entries %}
+            {% include 'card_entry.html' with note_entry=note_entry %}
+        {% endfor %}
+    </div>
+{% endif %}
+```
+In the same place where the code above was located, add a line of code:
+```
+<div id="note_entry_cards"></div>
+```
+Then, create a ```<script>``` block below the file (before ```{% endblock content%}``` and create a new function inside the ```<script>``` block with the name ```getNoteEntries```. 
+```
+async function getNoteEntries(){
+        return fetch("{% url 'main:show_json' %}").then((res) => res.json())
+      }
+```
+Create an another function inside the ```<script>``` block with the name ```refreshNoteEntries``` to refresh the data asynchronously. 
+```
+async function refreshNoteEntries() {
+        document.getElementById("note_entry_cards").innerHTML = "";
+        document.getElementById("note_entry_cards").className = "";
+        const noteEntries = await getNoteEntries();
+        let htmlString = "";
+        let classNameString = "";
+
+        if (noteEntries.length === 0) {
+          classNameString = "flex flex-col items-center justify-center min-h-[24rem] p-6";
+          htmlString = `
+            <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+                <img src="{% static 'image/no-data.png' %}" alt="No data" class="w-32 h-32 mb-4"/>
+                <p class="text-center text-gray-600 mt-4">No entry data on the Study Together with Notes yet.</p>
+            </div>
+          `;
+        }
+        else {
+          classNameString = "columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 w-full"
+          noteEntries.forEach((item) => {
+            const name = DOMPurify.sanitize(item.fields.name);
+            const subject  = DOMPurify.sanitize(item.fields.subject);
+            const description  = DOMPurify.sanitize(item.fields.description);
+            const price  = DOMPurify.sanitize(item.fields.price);
+            htmlString += `
+              <div class="relative break-inside-avoid">
+                <!-- Note Entry Card -->
+                <div style="background-color: rgb(174, 217, 217);" class="relative top-5 shadow-md mb-6 border-2 border-teal-600 transform rotate-0 hover:rotate-1 transition-transform duration-300">
+                  
+                  <!-- Card Header -->
+                  <div style="background-color: rgb(174, 217, 217);color: rgb(45, 45, 45);" class="p-4 border-b-2 border-teal-600">
+                    <div class="flex items-center justify-center mb-4">
+                      <i style="color:rgb(43, 30, 30);" class="fa fa-circle"></i>
+                    </div>
+                    <h3 class="font-bold text-center text-lg mb-2">${name}</h3>
+                    <h3 class="font-bold text-center text-lg mb-2">${subject}</h3>
+                  </div>
+
+                  <!-- Card Body -->
+                  <div style="background-color: rgb(231, 244, 244);" class="p-4">
+                    <p class="font-semibold text-lg mb-2"></p>
+                    <p class="text-gray-600">${description}</p>
+                    
+                    <!-- Edit and Delete Icons (Aligned Flexbox) -->
+                    <div class="flex justify-end space-x-1 mt-4">
+                      <a href="/edit-note/${item.pk}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-2 transition duration-300 shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </a>
+                      <a href="/delete/${item.pk}" class="bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition duration-300 shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 001 1v6a1 1 102 0V8a1 1 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        }
+        document.getElementById("note_entry_cards").className = classNameString;
+        document.getElementById("note_entry_cards").innerHTML = htmlString;
+      }
+      refreshNoteEntries();
+```
+
+5. #### Create modal as a form to add an entry
+Add the following code below to implmement the modal onto the application. Place the code below the section: ```<div id="note_entry_cards"></div>```. 
+```
+<div id="crudModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50 overflow-x-hidden overflow-y-auto transition-opacity duration-300 ease-out">
+      <div id="crudModalContent" class="relative bg-white rounded-lg shadow-lg w-5/6 sm:w-3/4 md:w-1/2 lg:w-1/3 mx-4 sm:mx-0 transform scale-95 opacity-0 transition-transform transition-opacity duration-300 ease-out">
+        <!-- Modal header -->
+        <div class="flex items-center justify-between p-4 border-b rounded-t">
+          <h3 class="text-xl font-semibold text-gray-900">
+            Add New Note Entry
+          </h3>
+          <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" id="closeModalBtn">
+            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="sr-only">Close modal</span>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="px-6 py-4 space-y-6 form-style">
+          <form id="notesEntryForm">
+            <div class="mb-4">
+              <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+              <input type="text" id="name" name="name" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Enter your name" required>
+            </div>
+            <div class="mb-4">
+              <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
+              <textarea id="subject" name="subject" rows="1" class="mt-1 block w-full h-32 resize-none border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Place the name of subject" required></textarea>
+            </div>
+            <div class="mb-4">
+              <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea id="description" name="description" rows="3" class="mt-1 block w-full h-32 resize-none border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Write down the description of the note" required></textarea>
+            </div>
+            <div class="mb-4">
+              <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+              <textarea id="price" name="price" rows="1" class="mt-1 block w-full h-10 resize-none border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Set price" required></textarea>
+            </div>
+          </form>
+        </div>
+        <!-- Modal footer -->
+        <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 p-6 border-t border-gray-200 rounded-b justify-center md:justify-end">
+          <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg" id="cancelButton">Cancel</button>
+          <button type="submit" id="submitNoteEntry" form="notesEntryForm" style="background-color: rgb(136, 195, 193);", class="text-white font-bold py-2 px-4 rounded-lg">Save</button>
+        </div>
+      </div>
+    </div>
+```
+There are no built-in modal classes in vanila Tailwind CSS, so modal work needs to be created. Place this code blow the function ```refreshNoteEntries()```.
+```
+const modal = document.getElementById('crudModal');
+      const modalContent = document.getElementById('crudModalContent');
+
+      function showModal() {
+        const modal = document.getElementById('crudModal');
+        const modalContent = document.getElementById('crudModalContent');
+
+        modal.classList.remove('hidden'); 
+        setTimeout(() => {
+          modalContent.classList.remove('opacity-0', 'scale-95');
+          modalContent.classList.add('opacity-100', 'scale-100');
+        }, 50); 
+      }
+        
+      function hideModal() {
+        const modal = document.getElementById('crudModal');
+        const modalContent = document.getElementById('crudModalContent');
+
+        modalContent.classList.remove('opacity-100', 'scale-100');
+        modalContent.classList.add('opacity-0', 'scale-95');
+
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 150); 
+      }
+      document.getElementById("cancelButton").addEventListener("click", hideModal);
+      document.getElementById("closeModalBtn").addEventListener("click", hideModal);
+
+```
+Then, add a new button to perform the addition of data with AJAX in the ```main.html``` file. 
+```
+<a href="{% url 'main:create_note_entry' %}" style="background-color: rgb(136, 195, 193);", class="text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"> 
+          <i class="fa fa-plus mr-2"></i> Add New Note Entry
+        </a>
+        <button data-modal-target="crudModal" data-modal-toggle="crudModal" style="background-color: rgb(136, 195, 193);", class="btn bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" onclick="showModal();">
+          Add New Note Entry by AJAX
+        </button>
+```
+
 </details>
 
