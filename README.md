@@ -1083,7 +1083,7 @@ const modal = document.getElementById('crudModal');
 ```
 Then, add a new button to perform the addition of data with AJAX in the ```main.html``` file. 
 ```
-<a href="{% url 'main:create_note_entry' %}" style="background-color: rgb(136, 195, 193);", class="text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"> 
+        <a href="{% url 'main:create_note_entry' %}" style="background-color: rgb(136, 195, 193);", class="text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"> 
           <i class="fa fa-plus mr-2"></i> Add New Note Entry
         </a>
         <button data-modal-target="crudModal" data-modal-toggle="crudModal" style="background-color: rgb(136, 195, 193);", class="btn bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" onclick="showModal();">
