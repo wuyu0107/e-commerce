@@ -865,6 +865,10 @@ def login_user(request):
             return response
         else:
             messages.error(request, "Invalid username or password. Please try again.")
+  else:
+      form = AuthenticationForm(request)
+   context = {'form': form}
+   return render(request, 'login.html', context)
 ```
 
 2. #### Create a function to add an entry with AJAX
@@ -1083,13 +1087,35 @@ const modal = document.getElementById('crudModal');
 ```
 Then, add a new button to perform the addition of data with AJAX in the ```main.html``` file. 
 ```
-        <a href="{% url 'main:create_note_entry' %}" style="background-color: rgb(136, 195, 193);", class="text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"> 
-          <i class="fa fa-plus mr-2"></i> Add New Note Entry
-        </a>
-        <button data-modal-target="crudModal" data-modal-toggle="crudModal" style="background-color: rgb(136, 195, 193);", class="btn bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" onclick="showModal();">
-          Add New Note Entry by AJAX
-        </button>
+<a href="{% url 'main:create_note_entry' %}" style="background-color: rgb(136, 195, 193);", class="text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"> 
+  <i class="fa fa-plus mr-2"></i> Add New Note Entry
+</a>
+<button data-modal-target="crudModal" data-modal-toggle="crudModal" style="background-color: rgb(136, 195, 193);", class="btn bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" onclick="showModal();">
+  Add New Note Entry by AJAX
+</button>
 ```
+
+6. #### Add Note Entry with AJAX
+Create a new JavaScript function to add data based on the input to the database in AJAX. In  the ```main_html``` file, create a new function inside the ```<script>``` block with the name ```addNoteEntry```. Then add an event listener to the form in the modal to run the ```addNoteEntry()``` function. 
+```
+function addNoteEntry() {
+    fetch("{% url 'main:add_note_entry_ajax' %}", {
+      method: "POST",
+      body: new FormData(document.querySelector('#notesEntryForm')),
+    })
+    .then(response => refreshNoteEntries())
+  
+    document.getElementById("notesEntryForm").reset(); 
+    document.querySelector("[data-modal-toggle='crudModal']").click();
+  
+    return false;
+  }
+  document.getElementById("notesEntryForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    addNoteEntry();
+  })
+```
+
 
 </details>
 
