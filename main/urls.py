@@ -13,7 +13,7 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('login/', login_user, name='login'),
     path('logout/', logout_user, name='logout'),
-    path('edit-entry/<uuid:id>', edit_entry, name='edit_entry'),
+    path('edit-note/<uuid:id>', edit_entry, name='edit_entry'),
     path('delete/<uuid:id>', delete_entry, name='delete_entry'),
     path('create-note-entry-ajax', add_note_entry_ajax, name='add_note_entry_ajax')
 ]

@@ -23,9 +23,9 @@ class NotesEntryForm(ModelForm):
         return strip_tags(subject)
     
     def clean_price(self):
-        price = self.cleaned_data("price")
+        price = self.cleaned_data.get("price")
         return strip_tags(price)
     
     def clean_description(self):
-        description = self.cleaned_data("description")
+        description = self.cleaned_data.get("description")
         return strip_tags(description)

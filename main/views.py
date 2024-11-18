@@ -92,7 +92,6 @@ def logout_user(request):
 
 def edit_entry(request, id):
     note = Product.objects.get(pk = id)
-
     form = NotesEntryForm(request.POST or None, instance = note)
 
     if form.is_valid() and request.method == "POST":
